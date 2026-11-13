@@ -30,15 +30,26 @@
       <span class="clock-divider" aria-hidden="true"></span>
       <time id="clockDate" class="clock-date"></time>
     </div>
-    <button id="fullscreenButton" class="button icon-button fullscreen-button" type="button" aria-label="Vollbild anzeigen" title="Vollbild anzeigen" aria-pressed="false">
-      <svg aria-hidden="true"><use id="fullscreenIcon" href="#icon-fullscreen"/></svg>
-    </button>
+    <div class="topbar-actions">
+      <button id="resetButton" class="button icon-button fullscreen-button" type="button" aria-label="Seite zurücksetzen" title="Seite zurücksetzen">
+        <svg aria-hidden="true"><use href="#icon-reset"/></svg>
+      </button>
+      <button id="fullscreenButton" class="button icon-button fullscreen-button" type="button" aria-label="Vollbild anzeigen" title="Vollbild anzeigen" aria-pressed="false">
+        <svg aria-hidden="true"><use id="fullscreenIcon" href="#icon-fullscreen"/></svg>
+      </button>
+    </div>
   </header>
 
   <main class="board">
     <section class="panel task-panel" aria-labelledby="taskHeading">
       <div class="panel-heading">
-        <h2 id="taskHeading">Aufgabenstellung</h2>
+        <div class="task-heading-main">
+          <h2 id="taskHeading">Aufgabenstellung</h2>
+          <div id="taskSwitcher" class="task-switcher" role="group" aria-label="Aufgabe auswählen">
+            <button class="task-number" type="button" data-task="0" aria-label="Aufgabe 1" aria-pressed="true">1</button>
+            <button id="addTask" class="task-number task-add" type="button" aria-label="Aufgabe hinzufügen" title="Aufgabe hinzufügen">+</button>
+          </div>
+        </div>
         <button id="clearTask" class="button icon-button quiet-button" type="button" aria-label="Aufgabenstellung leeren" title="Aufgabenstellung leeren" hidden>
           <svg aria-hidden="true"><use href="#icon-trash"/></svg>
         </button>

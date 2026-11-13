@@ -5,6 +5,8 @@
   const MAX_DURATION = (999 * 60 + 59) * 1000;
   const taskInput = document.getElementById("taskInput");
   const clearTask = document.getElementById("clearTask");
+  const taskSwitcher = document.getElementById("taskSwitcher");
+  const addTask = document.getElementById("addTask");
   const minutesInput = document.getElementById("minutesInput");
   const secondsInput = document.getElementById("secondsInput");
   const timerPanel = document.getElementById("timerPanel");
@@ -19,7 +21,9 @@
   const socialInputs = [...document.querySelectorAll('input[name="social"]')];
   const presetButtons = [...document.querySelectorAll("[data-minutes]")];
   const state = {
-    task: "",
+    taskLayoutVersion: 2,
+    tasks: [""],
+    activeTask: 0,
     social: "single",
     timer: { duration: 0, remaining: 0, endsAt: null, status: "ready" }
   };
@@ -36,7 +40,17 @@
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
       if (!saved || typeof saved !== "object") return;
-      if (typeof saved.task === "string") state.task = saved.task;
+      if (Array.isArray(saved.tasks) && saved.tasks.length) {
+        state.tasks = saved.tasks.map(task => typeof task === "string" ? task : "");
+        if (saved.taskLayoutVersion !== 2) {
+          while (state.tasks.length > 1 && state.tasks.at(-1) === "") state.tasks.pop();
+        }
+      } else if (typeof saved.task === "string") {
+        state.tasks[0] = saved.task;
+      }
+      if (Number.isInteger(saved.activeTask) && saved.activeTask >= 0 && saved.activeTask < state.tasks.length) {
+        state.activeTask = saved.activeTask;
+      }
       if (socialInputs.some(input => input.value === saved.social)) state.social = saved.social;
       const timer = saved.timer;
       if (!timer || !["ready", "running", "paused", "finished"].includes(timer.status)) return;
@@ -77,10 +91,36 @@
   }
 
   function setTask(value) {
-    state.task = value;
+    state.tasks[state.activeTask] = value;
     clearTask.hidden = value.length === 0;
     fitTask();
     persist();
+  }
+
+  function renderTask() {
+    taskInput.value = state.tasks[state.activeTask];
+    taskInput.scrollTop = 0;
+    clearTask.hidden = taskInput.value.length === 0;
+    const label = `Aufgabe ${state.activeTask + 1} leeren`;
+    clearTask.setAttribute("aria-label", label);
+    clearTask.title = label;
+    taskSwitcher.querySelectorAll("[data-task]").forEach(button => {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.task) === state.activeTask));
+    });
+    fitTask();
+  }
+
+  function renderTaskButtons() {
+    const buttons = state.tasks.map((_, index) => {
+      const button = document.createElement("button");
+      button.className = "task-number";
+      button.type = "button";
+      button.dataset.task = String(index);
+      button.textContent = String(index + 1);
+      button.setAttribute("aria-label", `Aufgabe ${index + 1}`);
+      return button;
+    });
+    taskSwitcher.replaceChildren(...buttons, addTask);
   }
 
   function writeEditor() {
@@ -181,6 +221,21 @@
   }
 
   taskInput.addEventListener("input", () => setTask(taskInput.value));
+  taskSwitcher.addEventListener("click", event => {
+    const button = event.target.closest("[data-task]");
+    if (!button || !taskSwitcher.contains(button)) return;
+    state.activeTask = Number(button.dataset.task);
+    renderTask();
+    persist();
+  });
+  addTask.addEventListener("click", () => {
+    state.tasks.push("");
+    state.activeTask = state.tasks.length - 1;
+    renderTaskButtons();
+    renderTask();
+    persist();
+    taskInput.focus();
+  });
   clearTask.addEventListener("click", () => {
     taskInput.value = "";
     setTask("");
@@ -279,9 +334,23 @@
   document.addEventListener("fullscreenchange", renderFullscreen);
   fullscreenButton.hidden = !document.fullscreenEnabled;
 
+  document.getElementById("resetButton").addEventListener("click", () => {
+    state.tasks = [""];
+    state.activeTask = 0;
+    state.social = "single";
+    state.timer = { duration: 0, remaining: 0, endsAt: null, status: "ready" };
+    document.getElementById("announcement").textContent = "";
+    renderTaskButtons();
+    renderTask();
+    socialInputs.forEach(input => { input.checked = input.value === state.social; });
+    writeEditor();
+    renderTimer();
+    persist();
+  });
+
   restore();
-  taskInput.value = state.task;
-  clearTask.hidden = state.task.length === 0;
+  renderTaskButtons();
+  renderTask();
   socialInputs.forEach(input => { input.checked = input.value === state.social; });
   writeEditor();
   renderTimer();
@@ -291,7 +360,17 @@
   taskObserver.observe(taskInput);
   window.addEventListener("resize", fitTask);
   document.fonts.ready.then(fitTask);
-  document.addEventListener("visibilitychange", tick);
+  document.addEventListener("visibilitychange", () => {
+    tick();
+    if (document.visibilityState === "hidden") persist();
+  });
+  window.addEventListener("pagehide", persist);
   window.addEventListener("pageshow", tick);
   setInterval(tick, 200);
+
+  if ("serviceWorker" in navigator && ["http:", "https:"].includes(location.protocol)) {
+    navigator.serviceWorker.register("./service-worker.js", { updateViaCache: "none" }).catch(() => {
+      // Die lokale Zustandsspeicherung funktioniert unabhängig vom Offline-Cache.
+    });
+  }
 })();
