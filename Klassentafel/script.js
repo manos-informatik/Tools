@@ -169,8 +169,9 @@
     const ready = timer.status === "ready";
     timerPanel.dataset.status = timer.status;
     timerPanel.classList.toggle("is-ending", remaining > 0 && remaining <= 60000 && !ready);
-    timerEditor.hidden = !ready;
-    timerDisplay.hidden = ready;
+    timerEditor.setAttribute("aria-hidden", String(!ready));
+    timerEditor.inert = !ready;
+    timerDisplay.setAttribute("aria-hidden", String(ready));
     const totalSeconds = Math.ceil(remaining / 1000);
     const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
     const seconds = String(totalSeconds % 60).padStart(2, "0");
@@ -303,7 +304,7 @@
     }
     persist();
     renderTimer();
-    timerToggle.focus();
+    timerToggle.focus({ preventScroll: true });
   });
 
   document.getElementById("timerReset").addEventListener("click", () => {

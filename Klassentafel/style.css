@@ -190,16 +190,18 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 
 .timer-panel { container-type: inline-size; }
 .timer-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: clamp(14px, 2.2vh, 26px); min-height: 0; padding-top: 10px; }
-.timer-face { width: 100%; font-variant-numeric: tabular-nums; font-size: clamp(80px, 10vw, 220px); font-size: clamp(80px, 34cqi, 220px); line-height: 1.05; letter-spacing: -.065em; font-weight: 650; }
-.timer-editor, .timer-display { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
-.timer-editor input { width: 100%; padding: 0; border: 0; border-radius: 6px; color: inherit; background: transparent; text-align: center; font: inherit; letter-spacing: inherit; appearance: textfield; -moz-appearance: textfield; }
+.timer-face { display: grid; width: 100%; font-variant-numeric: tabular-nums; font-size: clamp(80px, 10vw, 220px); font-size: clamp(80px, 34cqi, 220px); line-height: 1.05; letter-spacing: -.065em; font-weight: 650; }
+.timer-editor, .timer-display { grid-area: 1 / 1; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
+/* Beide Ansichten reservieren dieselbe Zeile, auch wenn eine unsichtbar ist. */
+.timer-editor[aria-hidden="true"], .timer-display[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
+.timer-editor input { width: 100%; height: 1.05em; padding: 0; border: 0; border-radius: 6px; color: inherit; background: transparent; text-align: center; font: inherit; letter-spacing: inherit; appearance: textfield; -moz-appearance: textfield; }
 .timer-editor input::-webkit-inner-spin-button, .timer-editor input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .timer-editor input::placeholder { color: var(--muted); opacity: .65; }
 .timer-colon { color: var(--muted); padding-bottom: .08em; }
 .timer-display { width: 100%; text-align: center; white-space: nowrap; }
 .timer-display .timer-colon { color: inherit; }
 .timer-face.has-hours { font-size: 28cqi; }
-.timer-progress { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(15, 23, 42, .7); }
+.timer-progress { height: 5px; flex-shrink: 0; overflow: hidden; border-radius: 999px; background: rgba(15, 23, 42, .7); }
 .timer-progress span { display: block; width: 100%; height: 100%; background: var(--primary); transform: scaleX(0); transform-origin: left; }
 .timer-indicator { width: 9px; height: 9px; border-radius: 50%; background: var(--button-border); }
 .timer-panel[data-status="running"] .timer-indicator { background: var(--secondary); box-shadow: 0 0 16px rgba(16, 185, 129, .35); }
