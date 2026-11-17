@@ -20,7 +20,7 @@
   --focus: 0 0 0 3px rgba(34, 211, 238, .3);
   --radius: 18px;
   --page-gap: clamp(14px, 1.6vw, 30px);
-  --panel-padding: clamp(20px, 2vw, 36px);
+  --panel-padding: clamp(18px, 1.6vw, 28px);
 }
 
 * { box-sizing: border-box; }
@@ -80,9 +80,9 @@ svg {
 .topbar-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .clock { display: flex; align-items: center; gap: clamp(16px, 1.8vw, 32px); min-width: 0; }
-.clock-time { font-size: clamp(30px, 2.8vw, 48px); font-weight: 650; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.04em; }
-.clock-divider { width: 1px; height: 26px; background: var(--border); }
-.clock-date { color: var(--muted); font-size: clamp(16px, 1.4vw, 24px); }
+.clock-time, .clock-date { font-size: clamp(30px, 2.8vw, 48px); font-weight: 650; line-height: 1.15; letter-spacing: -.04em; }
+.clock-time { flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.clock-divider { width: 1px; height: 1.8em; background: var(--border); flex-shrink: 0; }
 
 .board {
   flex: 1;
@@ -108,6 +108,7 @@ svg {
 .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; flex-shrink: 0; }
 h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font-weight: 650; letter-spacing: -.025em; }
 .task-panel { grid-row: 1 / -1; }
+.task-panel h2 { font-size: clamp(30px, 2.5vw, 44px); }
 .task-panel .panel-heading { padding-bottom: clamp(16px, 2vh, 28px); border-bottom: 1px solid var(--border); }
 .task-heading-main { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; min-width: 0; }
 .task-switcher { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
@@ -139,7 +140,7 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   flex: 1;
   width: 100%;
   min-height: 0;
-  margin-top: clamp(20px, 3vh, 40px);
+  margin-top: clamp(16px, 2vh, 28px);
   padding: 4px;
   border: 0;
   border-radius: 4px;
@@ -147,9 +148,9 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   resize: none;
   background: transparent;
   color: var(--text);
-  font-size: 64px;
+  font-size: 80px;
   font-weight: 600;
-  line-height: 1.26;
+  line-height: 1.15;
   letter-spacing: -.025em;
   overflow-wrap: anywhere;
   tab-size: 4;
@@ -189,14 +190,14 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 
 .timer-panel { container-type: inline-size; }
 .timer-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: clamp(14px, 2.2vh, 26px); min-height: 0; padding-top: 10px; }
-.timer-face { width: 100%; font-variant-numeric: tabular-nums; font-size: clamp(64px, 7.5vw, 150px); font-size: clamp(60px, 25cqi, 150px); line-height: 1.15; letter-spacing: -.065em; font-weight: 650; }
+.timer-face { width: 100%; font-variant-numeric: tabular-nums; font-size: clamp(80px, 10vw, 220px); font-size: clamp(80px, 34cqi, 220px); line-height: 1.05; letter-spacing: -.065em; font-weight: 650; }
 .timer-editor { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
 .timer-editor input { width: 100%; padding: 0; border: 0; border-radius: 6px; color: inherit; background: transparent; text-align: center; font: inherit; letter-spacing: inherit; appearance: textfield; -moz-appearance: textfield; }
 .timer-editor input::-webkit-inner-spin-button, .timer-editor input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .timer-editor input::placeholder { color: var(--muted); opacity: .65; }
 .timer-colon { color: var(--muted); padding-bottom: .08em; }
 .timer-display { display: block; width: 100%; text-align: center; white-space: nowrap; }
-.timer-face.has-hours { font-size: 21cqi; }
+.timer-face.has-hours { font-size: 28cqi; }
 .timer-progress { height: 5px; overflow: hidden; border-radius: 999px; background: rgba(15, 23, 42, .7); }
 .timer-progress span { display: block; width: 100%; height: 100%; background: var(--primary); transform: scaleX(0); transform-origin: left; }
 .timer-indicator { width: 9px; height: 9px; border-radius: 50%; background: var(--button-border); }
@@ -211,34 +212,38 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 .timer-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
 
 .social-options { flex: 1; display: grid; grid-template-rows: repeat(3, minmax(52px, 1fr)); gap: clamp(8px, 1.2vh, 14px); margin-top: 14px; }
-.social-option { position: relative; display: flex; align-items: center; gap: clamp(12px, 1.1vw, 20px); min-width: 0; padding: 10px clamp(12px, 1.1vw, 20px); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); background: rgba(15, 23, 42, .24); cursor: pointer; transition: filter 150ms ease; }
+.social-option { position: relative; display: flex; align-items: center; gap: clamp(10px, 1vw, 18px); min-width: 0; padding: 10px clamp(10px, 1vw, 18px); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); background: rgba(15, 23, 42, .24); cursor: pointer; transition: filter 150ms ease; }
 .social-option:hover { filter: brightness(1.15); }
 .social-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
 .social-option span { min-width: 0; font-size: clamp(18px, 1.5vw, 28px); font-weight: 600; letter-spacing: -.025em; }
-.social-icon { width: 40px; height: 32px; }
+.social-icon { width: clamp(64px, 6vw, 112px); height: clamp(40px, 3.4vw, 64px); stroke-width: 2.2; }
 .selection-check { width: 22px; height: 22px; margin-left: auto; visibility: hidden; }
 .social-option:has(input:checked) { color: var(--text); border-color: var(--secondary); background: rgba(16, 185, 129, .14); }
 .social-option:has(input:checked) .social-icon, .social-option:has(input:checked) .selection-check { color: var(--secondary); }
 .social-option:has(input:checked) .selection-check { visibility: visible; }
 .social-option:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; box-shadow: var(--focus); }
 
-@media (min-width: 901px) and (max-height: 740px) {
+@media (min-width: 901px) and (max-height: 850px) {
   :root { --panel-padding: 18px; }
   .topbar { min-height: 64px; }
   .board { grid-template-rows: minmax(0, 1.3fr) minmax(0, 1fr); }
   .timer-body { gap: 10px; padding-top: 4px; }
-  .timer-face { font-size: min(22cqi, 13vh); }
+  .timer-face { font-size: min(34cqi, 17vh); }
+  .timer-face.has-hours { font-size: min(28cqi, 17vh); }
   .social-options { margin-top: 8px; gap: 7px; grid-template-rows: repeat(3, minmax(44px, 1fr)); }
-  .social-option { padding-block: 6px; }
+  .social-option { padding-block: 4px; }
 }
 
 @media (max-width: 900px) {
   body { height: auto; min-height: 100vh; min-height: 100dvh; }
+  .topbar { padding-block: 14px; }
+  .clock { gap: 4px; align-items: flex-start; flex-direction: column; }
+  .clock-divider { display: none; }
   .board { flex: none; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(380px, 55dvh) auto auto; }
   .task-panel { grid-row: auto; }
   .timer-body { gap: 18px; }
-  .timer-face { font-size: clamp(80px, 19cqi, 160px); }
-  .timer-face.has-hours { font-size: clamp(70px, 16cqi, 140px); }
+  .timer-face { font-size: clamp(96px, 28cqi, 220px); }
+  .timer-face.has-hours { font-size: clamp(80px, 23cqi, 180px); }
   .timer-panel { padding-bottom: 22px; }
   .social-options { grid-template-rows: repeat(3, minmax(68px, 1fr)); }
   .social-option span { font-size: 22px; }
@@ -248,16 +253,17 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 @media (max-width: 540px) {
   :root { --panel-padding: 18px; --page-gap: 12px; }
   .topbar { min-height: 84px; }
-  .clock { gap: 3px; align-items: flex-start; flex-direction: column; }
-  .clock-divider { display: none; }
-  .clock-time { font-size: 28px; }
-  .clock-date { font-size: 14px; }
+  .clock-time, .clock-date { font-size: 28px; }
   .panel-heading { min-height: 40px; }
   h2 { font-size: 22px; }
-  .task-panel .panel-heading { padding-bottom: 12px; }
+  .task-panel .panel-heading { position: relative; padding-bottom: 12px; }
+  .task-heading-main { width: 100%; flex-direction: column; align-items: flex-start; }
+  .task-switcher { width: 100%; padding-right: 56px; }
+  .task-panel .quiet-button { position: absolute; right: 0; bottom: 12px; }
   #taskInput { margin-top: 16px; }
-  .timer-face { font-size: 26cqi; }
-  .timer-face.has-hours { font-size: 22cqi; }
+  .timer-face { font-size: 34cqi; }
+  .timer-face.has-hours { font-size: 28cqi; }
+  .social-option span { overflow-wrap: anywhere; }
 }
 
 @media (min-width: 901px) and (max-height: 590px) {
@@ -272,7 +278,7 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   .panel-heading { min-height: 32px; }
   h2 { font-size: 22px; }
   .timer-body { gap: 8px; }
-  .timer-face { font-size: min(22cqi, 11vh); }
+  .timer-face { font-size: min(34cqi, 17vh); }
   .preset-button { min-height: 36px; }
   .timer-actions .button { min-height: 44px; padding-block: 9px; }
   .social-options { gap: 6px; }
