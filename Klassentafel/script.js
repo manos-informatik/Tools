@@ -12,6 +12,8 @@
   const timerPanel = document.getElementById("timerPanel");
   const timerEditor = document.getElementById("timerEditor");
   const timerDisplay = document.getElementById("timerDisplay");
+  const timerMinutes = document.getElementById("timerMinutes");
+  const timerSeconds = document.getElementById("timerSeconds");
   const timerToggle = document.getElementById("timerToggle");
   const timerToggleLabel = document.getElementById("timerToggleLabel");
   const timerToggleIcon = document.getElementById("timerToggleIcon");
@@ -170,8 +172,10 @@
     timerEditor.hidden = !ready;
     timerDisplay.hidden = ready;
     const totalSeconds = Math.ceil(remaining / 1000);
-    const label = `${String(Math.floor(totalSeconds / 60)).padStart(2, "0")}:${String(totalSeconds % 60).padStart(2, "0")}`;
-    if (timerDisplay.textContent !== label) timerDisplay.textContent = label;
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
+    if (timerMinutes.textContent !== minutes) timerMinutes.textContent = minutes;
+    if (timerSeconds.textContent !== seconds) timerSeconds.textContent = seconds;
     const running = timer.status === "running";
     const toggleLabel = running ? "Pause" : timer.status === "paused" ? "Weiter" : "Start";
     if (timerToggleLabel.textContent !== toggleLabel) timerToggleLabel.textContent = toggleLabel;
