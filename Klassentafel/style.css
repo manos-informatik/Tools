@@ -237,7 +237,18 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 
 .social-panel { container-type: inline-size; }
 .group-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
-.group-size { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; color: var(--muted); font-size: 13px; }
+.group-size {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  color: var(--text);
+  font-size: clamp(18px, 1.5vw, 28px);
+  font-weight: 600;
+  line-height: 1;
+}
+.group-row:has(input[value="group"]:checked) .group-size { display: flex; }
 .group-size input { width: 3em; height: 1.5em; padding: 0 2px; border: 1px solid var(--button-border); border-radius: 6px; background: var(--bg); color: var(--text); text-align: center; font-size: clamp(20px, 1.6vw, 30px); font-weight: 650; }
 .group-size input:focus-visible { outline: 2px solid var(--primary); }
 @container (max-width: 330px) {
@@ -255,6 +266,8 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   .timer-face.has-hours { font-size: min(28cqi, 17vh); }
   .social-options { margin-top: 8px; gap: 7px; grid-template-rows: repeat(3, minmax(44px, 1fr)); }
   .social-option { padding-block: 4px; }
+  .group-size { font-size: 18px; }
+  .group-size input { height: 24px; }
 }
 
 @media (max-width: 900px) {
