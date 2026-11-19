@@ -135,17 +135,23 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 .task-number:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; box-shadow: var(--focus); }
 .task-panel .quiet-button { align-self: flex-start; }
 
-#taskInput {
-  display: block;
+.task-field {
+  position: relative;
   flex: 1;
-  width: 100%;
   min-height: 0;
   margin-top: clamp(16px, 2vh, 28px);
+}
+.task-text {
+  position: absolute;
+  inset: 0;
   padding: 4px;
   border: 0;
   border-radius: 4px;
   outline: none;
-  resize: none;
+  overflow: auto;
+  white-space: pre-wrap;
+  text-align: justify;
+  hyphens: auto;
   background: transparent;
   color: var(--text);
   font-size: 80px;
@@ -158,6 +164,9 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   scrollbar-gutter: stable;
   scrollbar-color: var(--button-border) transparent;
 }
+#taskPreview { pointer-events: none; }
+.task-field:focus-within #taskPreview { visibility: hidden; }
+#taskInput:not(:focus) { opacity: 0; }
 
 #taskInput:focus-visible { box-shadow: inset 0 0 0 2px rgba(34, 211, 238, .3); }
 ::selection { background: rgba(34, 211, 238, .25); }
@@ -226,6 +235,17 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 .social-option:has(input:checked) .selection-check { visibility: visible; }
 .social-option:has(input:focus-visible) { outline: 2px solid var(--primary); outline-offset: 3px; box-shadow: var(--focus); }
 
+.social-panel { container-type: inline-size; }
+.group-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+.group-size { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; color: var(--muted); font-size: 13px; }
+.group-size input { width: 3em; height: 1.5em; padding: 0 2px; border: 1px solid var(--button-border); border-radius: 6px; background: var(--bg); color: var(--text); text-align: center; font-size: clamp(20px, 1.6vw, 30px); font-weight: 650; }
+.group-size input:focus-visible { outline: 2px solid var(--primary); }
+@container (max-width: 330px) {
+  .group-row .social-option { gap: 6px; padding-inline: 6px; }
+  .group-row .social-option span { font-size: 18px; }
+  .group-size input { width: 2.6em; }
+}
+
 @media (min-width: 901px) and (max-height: 850px) {
   :root { --panel-padding: 18px; }
   .topbar { min-height: 64px; }
@@ -263,7 +283,7 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   .task-heading-main { width: 100%; flex-direction: column; align-items: flex-start; }
   .task-switcher { width: 100%; padding-right: 56px; }
   .task-panel .quiet-button { position: absolute; right: 0; bottom: 12px; }
-  #taskInput { margin-top: 16px; }
+  .task-field { margin-top: 16px; }
   .timer-face { font-size: 34cqi; }
   .timer-face.has-hours { font-size: 28cqi; }
   .social-option span { overflow-wrap: anywhere; }

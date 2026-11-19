@@ -7,6 +7,8 @@
   <title>Klassentafel</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
+  <script src="vendor/hyphen/hyphen.js" defer></script>
+  <script src="vendor/hyphen/patterns/de-1996.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -54,7 +56,10 @@
           <svg aria-hidden="true"><use href="#icon-trash"/></svg>
         </button>
       </div>
-      <textarea id="taskInput" aria-labelledby="taskHeading" spellcheck="false"></textarea>
+      <div class="task-field">
+        <div id="taskInput" class="task-text" contenteditable="plaintext-only" role="textbox" aria-multiline="true" aria-labelledby="taskHeading" spellcheck="false"></div>
+        <div id="taskPreview" class="task-text" aria-hidden="true"></div>
+      </div>
     </section>
 
     <section id="timerPanel" class="panel timer-panel" aria-labelledby="timerHeading">
@@ -107,12 +112,17 @@
           <span>Paararbeit</span>
           <svg class="selection-check" aria-hidden="true"><use href="#icon-check"/></svg>
         </label>
-        <label class="social-option">
-          <input type="radio" name="social" value="group">
-          <svg class="social-icon" aria-hidden="true"><use href="#icon-group"/></svg>
-          <span>Gruppenarbeit</span>
-          <svg class="selection-check" aria-hidden="true"><use href="#icon-check"/></svg>
-        </label>
+        <div class="group-row">
+          <label class="social-option">
+            <input type="radio" name="social" value="group">
+            <svg class="social-icon" aria-hidden="true"><use href="#icon-group"/></svg>
+            <span>Gruppenarbeit</span>
+          </label>
+          <label class="group-size">
+            <span>Größe</span>
+            <input id="groupSize" type="number" min="1" step="1" inputmode="numeric" aria-label="Gruppengröße">
+          </label>
+        </div>
       </div>
     </section>
   </main>

@@ -4,6 +4,8 @@
   const STORAGE_KEY = "tools-klassentafel-v1";
   const MAX_DURATION = (999 * 60 + 59) * 1000;
   const taskInput = document.getElementById("taskInput");
+  const taskPreview = document.getElementById("taskPreview");
+  const hyphenate = createHyphenator(hyphenationPatternsDe1996, { html: false });
   const clearTask = document.getElementById("clearTask");
   const taskSwitcher = document.getElementById("taskSwitcher");
   const addTask = document.getElementById("addTask");
@@ -21,12 +23,14 @@
   const timerProgressFill = document.getElementById("timerProgressFill");
   const fullscreenButton = document.getElementById("fullscreenButton");
   const socialInputs = [...document.querySelectorAll('input[name="social"]')];
+  const groupSize = document.getElementById("groupSize");
   const presetButtons = [...document.querySelectorAll("[data-minutes]")];
   const state = {
     taskLayoutVersion: 2,
     tasks: [""],
     activeTask: 0,
     social: "single",
+    groupSize: null,
     timer: { duration: 0, remaining: 0, endsAt: null, status: "ready" }
   };
 
@@ -54,6 +58,7 @@
         state.activeTask = saved.activeTask;
       }
       if (socialInputs.some(input => input.value === saved.social)) state.social = saved.social;
+      if (Number.isSafeInteger(saved.groupSize) && saved.groupSize > 0) state.groupSize = saved.groupSize;
       const timer = saved.timer;
       if (!timer || !["ready", "running", "paused", "finished"].includes(timer.status)) return;
       if (!Number.isInteger(timer.duration) || timer.duration < 0 || timer.duration > MAX_DURATION) return;
@@ -74,35 +79,40 @@
   function fitTask() {
     cancelAnimationFrame(fitFrame);
     fitFrame = requestAnimationFrame(() => {
-      if (!taskInput.clientWidth || !taskInput.clientHeight) return;
-      const scrollTop = taskInput.scrollTop;
+      const field = document.activeElement === taskInput ? taskInput : taskPreview;
+      if (!field.clientWidth || !field.clientHeight) return;
+      const scrollTop = field.scrollTop;
       let low = 16;
-      let high = Math.max(low, taskInput.clientHeight);
+      let high = Math.max(low, field.clientHeight);
       while (high - low > .5) {
         const size = (low + high) / 2;
-        taskInput.style.fontSize = `${size}px`;
-        if (taskInput.scrollHeight <= taskInput.clientHeight + 1 && taskInput.scrollWidth <= taskInput.clientWidth + 1) {
+        field.style.fontSize = `${size}px`;
+        if (field.scrollHeight <= field.clientHeight + 1 && field.scrollWidth <= field.clientWidth + 1) {
           low = size;
         } else {
           high = size;
         }
       }
-      taskInput.style.fontSize = `${Math.floor(low * 10) / 10}px`;
-      taskInput.scrollTop = scrollTop;
+      const fontSize = `${Math.floor(low * 10) / 10}px`;
+      taskInput.style.fontSize = taskPreview.style.fontSize = fontSize;
+      field.scrollTop = scrollTop;
     });
   }
 
   function setTask(value) {
     state.tasks[state.activeTask] = value;
+    taskPreview.textContent = hyphenate(value);
     clearTask.hidden = value.length === 0;
     fitTask();
     persist();
   }
 
   function renderTask() {
-    taskInput.value = state.tasks[state.activeTask];
+    taskInput.textContent = state.tasks[state.activeTask];
+    taskPreview.textContent = hyphenate(state.tasks[state.activeTask]);
+    taskPreview.scrollTop = 0;
     taskInput.scrollTop = 0;
-    clearTask.hidden = taskInput.value.length === 0;
+    clearTask.hidden = state.tasks[state.activeTask].length === 0;
     const label = `Aufgabe ${state.activeTask + 1} leeren`;
     clearTask.setAttribute("aria-label", label);
     clearTask.title = label;
@@ -225,7 +235,9 @@
     }
   }
 
-  taskInput.addEventListener("input", () => setTask(taskInput.value));
+  taskInput.addEventListener("input", () => setTask(taskInput.innerText));
+  taskInput.addEventListener("focus", fitTask);
+  taskInput.addEventListener("blur", fitTask);
   taskSwitcher.addEventListener("click", event => {
     const button = event.target.closest("[data-task]");
     if (!button || !taskSwitcher.contains(button)) return;
@@ -242,7 +254,7 @@
     taskInput.focus();
   });
   clearTask.addEventListener("click", () => {
-    taskInput.value = "";
+    taskInput.textContent = "";
     setTask("");
     taskInput.focus();
   });
@@ -251,6 +263,15 @@
     state.social = input.value;
     persist();
   }));
+
+  groupSize.addEventListener("input", () => {
+    const size = groupSize.valueAsNumber;
+    state.groupSize = Number.isSafeInteger(size) && size > 0 ? size : null;
+    persist();
+  });
+  groupSize.addEventListener("blur", () => {
+    groupSize.value = state.groupSize ?? "";
+  });
 
   [minutesInput, secondsInput].forEach(input => {
     input.addEventListener("input", () => {
@@ -343,6 +364,8 @@
     state.tasks = [""];
     state.activeTask = 0;
     state.social = "single";
+    state.groupSize = null;
+    groupSize.value = "";
     state.timer = { duration: 0, remaining: 0, endsAt: null, status: "ready" };
     document.getElementById("announcement").textContent = "";
     renderTaskButtons();
@@ -354,6 +377,7 @@
   });
 
   restore();
+  groupSize.value = state.groupSize ?? "";
   renderTaskButtons();
   renderTask();
   socialInputs.forEach(input => { input.checked = input.value === state.social; });
