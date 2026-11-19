@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="vendor/hyphen/hyphen.js" defer></script>
   <script src="vendor/hyphen/patterns/de-1996.js" defer></script>
+  <script src="vendor/fflate/fflate.js" defer></script>
   <script src="script.js" defer></script>
 </head>
 <body>
@@ -36,6 +37,7 @@
       <button id="resetButton" class="button icon-button fullscreen-button" type="button" aria-label="Seite zurücksetzen" title="Seite zurücksetzen">
         <svg aria-hidden="true"><use href="#icon-reset"/></svg>
       </button>
+      <button id="templatesButton" class="button icon-button fullscreen-button templates-button" type="button" aria-label="Vorlagen öffnen" title="Vorlagen öffnen" aria-haspopup="dialog" aria-controls="templatesDialog">V</button>
       <button id="fullscreenButton" class="button icon-button fullscreen-button" type="button" aria-label="Vollbild anzeigen" title="Vollbild anzeigen" aria-pressed="false">
         <svg aria-hidden="true"><use id="fullscreenIcon" href="#icon-fullscreen"/></svg>
       </button>
@@ -126,6 +128,17 @@
       </div>
     </section>
   </main>
+  <dialog id="templatesDialog" class="templates-dialog" aria-labelledby="templatesHeading" aria-describedby="templatesTarget">
+    <div class="panel-heading">
+      <h2 id="templatesHeading">Vorlagen</h2>
+      <form method="dialog">
+        <button type="submit" class="button" autofocus>Schließen</button>
+      </form>
+    </div>
+    <p id="templatesTarget"></p>
+    <p id="templatesStatus" role="status"></p>
+    <ul id="templatesList" class="templates-list"></ul>
+  </dialog>
   <p id="announcement" class="sr-only" role="status" aria-live="polite"></p>
 </body>
 </html>

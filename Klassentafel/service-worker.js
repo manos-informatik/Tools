@@ -1,9 +1,9 @@
 "use strict";
 
 const CACHE_PREFIX = `klassentafel:${self.registration.scope}:`;
-const CACHE_NAME = `${CACHE_PREFIX}v2`;
+const CACHE_NAME = `${CACHE_PREFIX}v5`;
 const ASSETS = ["./", "./index.html", "./style.css", "./script.js", "./favicon.svg",
-  "./vendor/hyphen/hyphen.js", "./vendor/hyphen/patterns/de-1996.js"]
+  "./vorlagen.ods", "./vendor/fflate/fflate.js", "./vendor/hyphen/hyphen.js", "./vendor/hyphen/patterns/de-1996.js"]
   .map(path => new URL(path, self.registration.scope).href);
 
 self.addEventListener("install", event => {

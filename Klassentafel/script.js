@@ -9,6 +9,11 @@
   const clearTask = document.getElementById("clearTask");
   const taskSwitcher = document.getElementById("taskSwitcher");
   const addTask = document.getElementById("addTask");
+  const templatesButton = document.getElementById("templatesButton");
+  const templatesDialog = document.getElementById("templatesDialog");
+  const templatesTarget = document.getElementById("templatesTarget");
+  const templatesStatus = document.getElementById("templatesStatus");
+  const templatesList = document.getElementById("templatesList");
   const minutesInput = document.getElementById("minutesInput");
   const secondsInput = document.getElementById("secondsInput");
   const timerPanel = document.getElementById("timerPanel");
@@ -135,6 +140,112 @@
     taskSwitcher.replaceChildren(...buttons, addTask);
   }
 
+  const odfText = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
+  const odfTable = "urn:oasis:names:tc:opendocument:xmlns:table:1.0";
+  const odfOffice = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
+
+  function readOdfText(node) {
+    if (node.nodeType === Node.TEXT_NODE) return node.data.replace(/[\t\r\n ]+/g, " ");
+    if (node.namespaceURI === odfText) {
+      if (node.localName === "line-break") return "\n";
+      if (node.localName === "tab") return "\t";
+      if (node.localName === "s") {
+        return " ".repeat(Math.min(10000, Math.max(1, Number(node.getAttributeNS(odfText, "c")) || 1)));
+      }
+    }
+    return Array.from(node.childNodes, readOdfText).join("");
+  }
+
+  function readOdsTemplates(buffer) {
+    const files = fflate.unzipSync(new Uint8Array(buffer), {
+      filter: entry => entry.name === "content.xml"
+    });
+    if (!files["content.xml"]) throw new Error("content.xml fehlt");
+    const xml = new DOMParser().parseFromString(new TextDecoder().decode(files["content.xml"]), "application/xml");
+    const spreadsheet = xml.getElementsByTagNameNS(odfOffice, "spreadsheet")[0];
+    const table = spreadsheet?.getElementsByTagNameNS(odfTable, "table")[0];
+    if (!table) throw new Error("Vorlagentabelle fehlt");
+
+    const templates = [];
+    for (const row of table.getElementsByTagNameNS(odfTable, "table-row")) {
+      const cells = [];
+      for (const cell of row.children) {
+        if (cell.namespaceURI !== odfTable || !["table-cell", "covered-table-cell"].includes(cell.localName)) continue;
+        const value = Array.from(cell.children)
+          .filter(paragraph => paragraph.namespaceURI === odfText && paragraph.localName === "p")
+          .map(readOdfText).join("\n").trim();
+        const repeat = Number(cell.getAttributeNS(odfTable, "number-columns-repeated")) || 1;
+        // Calc fasst gleiche Zellen zusammen, auch leere Zellen bis zum Tabellenende.
+        for (let i = 0; i < repeat && cells.length < 2; i++) cells.push(value);
+        if (cells.length === 2) break;
+      }
+      const [description, content] = cells;
+      if (!description && !content) continue;
+      if (!description || !content) {
+        throw new Error("Ungültige Vorlagenzeile");
+      }
+      if (!templates.length && description.toLowerCase() === "beschreibung" && content.toLowerCase() === "inhalt") continue;
+      templates.push([description, content]);
+    }
+    return templates;
+  }
+
+  let templatesRequest = 0;
+  async function openTemplates() {
+    const request = ++templatesRequest;
+    templatesTarget.textContent = `Die ausgewählte Vorlage ersetzt den Text in Aufgabe ${state.activeTask + 1}.`;
+    templatesList.replaceChildren();
+    templatesStatus.textContent = "Vorlagen werden geladen …";
+    templatesDialog.showModal();
+    templatesDialog.scrollTop = 0;
+
+    let buffer;
+    try {
+      const response = await fetch("./vorlagen.ods", { cache: "no-cache" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      buffer = await response.arrayBuffer();
+    } catch {
+      if (request === templatesRequest && templatesDialog.open) {
+        templatesStatus.textContent = location.protocol === "file:"
+          ? "Öffne die Klassentafel über einen Webserver, um vorlagen.ods zu laden."
+          : "vorlagen.ods konnte nicht geladen werden.";
+      }
+      return;
+    }
+    if (request !== templatesRequest || !templatesDialog.open) return;
+
+    let templates;
+    try {
+      templates = readOdsTemplates(buffer);
+    } catch {
+      templatesStatus.textContent = "Prüfe das erste Tabellenblatt in vorlagen.ods. Jede Vorlage braucht eine Beschreibung und einen Inhalt.";
+      return;
+    }
+
+    templatesStatus.textContent = templates.length ? "" : "Die ODS-Datei enthält noch keine Vorlagen.";
+    for (const [description, content] of templates) {
+      const item = document.createElement("li");
+      const button = document.createElement("button");
+      const title = document.createElement("span");
+      const preview = document.createElement("span");
+      button.type = "button";
+      button.className = "button template-choice";
+      title.className = "template-description";
+      title.textContent = description.trim();
+      preview.className = "template-content";
+      preview.textContent = content;
+      button.append(title, preview);
+      item.append(button);
+      templatesList.append(item);
+      button.addEventListener("click", () => {
+        state.tasks[state.activeTask] = content;
+        renderTask();
+        persist();
+        templatesDialog.close();
+      });
+    }
+  }
+
   function writeEditor() {
     const seconds = Math.round(state.timer.duration / 1000);
     minutesInput.value = seconds ? String(Math.floor(seconds / 60)).padStart(2, "0") : "";
@@ -236,6 +347,7 @@
   }
 
   taskInput.addEventListener("input", () => setTask(taskInput.innerText));
+  templatesButton.addEventListener("click", openTemplates);
   taskInput.addEventListener("focus", fitTask);
   taskInput.addEventListener("blur", fitTask);
   taskSwitcher.addEventListener("click", event => {

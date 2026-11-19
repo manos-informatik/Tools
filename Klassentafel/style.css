@@ -197,6 +197,32 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
 .primary-button { border-color: var(--primary); background: var(--primary); color: var(--on-primary); }
 .primary-button svg { stroke-width: 2.2; }
 
+.templates-button { font-size: 24px; line-height: 1; }
+.templates-dialog {
+  width: min(680px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  padding: var(--panel-padding);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.templates-dialog::backdrop { background: rgba(8, 15, 28, .8); }
+.templates-dialog p { color: var(--muted); }
+.templates-dialog p:empty, .templates-list:empty { display: none; }
+.templates-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.template-choice {
+  display: grid;
+  width: 100%;
+  gap: 6px;
+  justify-content: stretch;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.template-description { font-size: 1.125rem; color: var(--primary); }
+.template-content { white-space: pre-wrap; font-weight: 500; color: var(--text); }
+
 .timer-panel { container-type: inline-size; }
 .timer-body { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: clamp(14px, 2.2vh, 26px); min-height: 0; padding-top: 10px; }
 .timer-face { display: grid; width: 100%; font-variant-numeric: tabular-nums; font-size: clamp(80px, 10vw, 220px); font-size: clamp(80px, 34cqi, 220px); line-height: 1.05; letter-spacing: -.065em; font-weight: 650; }
