@@ -5,7 +5,6 @@
   const MAX_DURATION = (999 * 60 + 59) * 1000;
   const taskInput = document.getElementById("taskInput");
   const taskPreview = document.getElementById("taskPreview");
-  const hyphenate = createHyphenator(hyphenationPatternsDe1996, { html: false });
   const clearTask = document.getElementById("clearTask");
   const taskSwitcher = document.getElementById("taskSwitcher");
   const addTask = document.getElementById("addTask");
@@ -106,15 +105,14 @@
 
   function setTask(value) {
     state.tasks[state.activeTask] = value;
-    taskPreview.textContent = hyphenate(value);
+    taskPreview.textContent = value;
     clearTask.hidden = value.length === 0;
     fitTask();
     persist();
   }
 
   function renderTask() {
-    taskInput.textContent = state.tasks[state.activeTask];
-    taskPreview.textContent = hyphenate(state.tasks[state.activeTask]);
+    taskInput.textContent = taskPreview.textContent = state.tasks[state.activeTask];
     taskPreview.scrollTop = 0;
     taskInput.scrollTop = 0;
     clearTask.hidden = state.tasks[state.activeTask].length === 0;

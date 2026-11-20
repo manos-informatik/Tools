@@ -151,7 +151,7 @@ h2 { margin: 0; color: var(--primary); font-size: clamp(22px, 1.7vw, 32px); font
   overflow: auto;
   white-space: pre-wrap;
   text-align: justify;
-  hyphens: auto;
+  hyphens: none;
   background: transparent;
   color: var(--text);
   font-size: 80px;
