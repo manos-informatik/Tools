@@ -1,7 +1,7 @@
 "use strict";
 
 const CACHE_PREFIX = `klassentafel:${self.registration.scope}:`;
-const CACHE_NAME = `${CACHE_PREFIX}v6`;
+const CACHE_NAME = `${CACHE_PREFIX}v8`;
 const ASSETS = ["./", "./index.html", "./style.css", "./script.js", "./favicon.svg",
   "./vorlagen.ods", "./vendor/fflate/fflate.js"]
   .map(path => new URL(path, self.registration.scope).href);
